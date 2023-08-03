@@ -1,0 +1,8 @@
+# compiled objects
+build/
+
+# log files
+*.log
+
+# python stuff
+__pycache__/
