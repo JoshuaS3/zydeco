@@ -13,6 +13,11 @@ set(INCLUDE_DIR "include")
 set(CMAKE_CXX_STANDARD 20)
 set(COMPILE_OPTIONS "-O3 -Wall -Wextra -pedantic")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    add_compile_options (-fdiagnostics-color=always)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_compile_options (-fcolor-diagnostics)
+endif ()
 
 # Add source files
 include_directories(${INCLUDE_DIR})
@@ -20,13 +25,14 @@ set(PROGRAM_SOURCES
     "${SOURCE_DIR}/main.cpp"
     "${SOURCE_DIR}/util/Logger.cpp"
     "${SOURCE_DIR}/util/Fault.cpp"
+    "${SOURCE_DIR}/game/Engine.cpp"
     "${SOURCE_DIR}/game/Window.cpp"
 )
 
 
 # Link libraries
 find_package(cpptrace REQUIRED)
-link_libraries("fmt" "SDL2" "cpptrace::cpptrace")
+link_libraries("fmt" "cpptrace::cpptrace" "SDL2" "GL")
 
 
 # Output

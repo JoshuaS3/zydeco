@@ -1,11 +1,9 @@
 #include <iostream>
-#include <fmt/core.h>
-
-using std::cout;
-using std::endl;
+#include <thread>
 
 #include "ZydecoCommon.hpp"
-#include "Window.hpp"
+#include "Engine.hpp"
+
 static Logger LOGGER("MAIN");
 
 static const char *ZYDECO_TERMOUT[] = {
@@ -13,20 +11,25 @@ static const char *ZYDECO_TERMOUT[] = {
     "<https://joshstock.in> <josh@joshstock.in>",
 };
 
+
 int main(int argc, char *argv[])
 {
     // Print boilerplate copyright output
     for (const char *line : ZYDECO_TERMOUT)
     {
-        cout << line << endl;
+        std::cout << line << std::endl;
     }
 
-    Logger::InitializeLogging(Logger::TRACE, &std::cout);
-    LOGGER.Log(Logger::INFO, "Entering main routine");
+    Logger::InitializeLogging(Logger::VERBOSE, &std::cout);
+    LOGGER.Log(Logger::INFO, "Logging initialized.");
 
-    LOGGER.Log(Logger::INFO, "Creating SDL window");
-    Window w = Window("Zydeco");
+    LOGGER.Log(Logger::INFO, "Creating game...");
+    Engine engine {};
 
-    while(1){}
+    LOGGER.Log(Logger::INFO, "Entering game loop");
+    engine.Start();
+
+    LOGGER.Log(Logger::INFO, "Exiting game loop");
+
     return 0;
 }

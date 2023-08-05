@@ -19,5 +19,5 @@ echo "Running..."
 echo "-------- PROGRAM START ---------"
 ./zydeco
 EC=$?
-echo -"-------- PROGRAM END ----------"
+echo "--------- PROGRAM END ----------"
 echo "Exited with $EC"
