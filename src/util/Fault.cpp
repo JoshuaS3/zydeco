@@ -2,7 +2,9 @@
 #include <cpptrace/cpptrace.hpp>
 #include "ZydecoCommon.hpp"
 
+
 static Logger LOGGER("FAULT");
+
 
 [[noreturn]] void ZydecoFault(std::string fault_message)
 {

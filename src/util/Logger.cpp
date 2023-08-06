@@ -35,8 +35,7 @@ void Logger::InitializeLogging(Verbosity max_verbosity, std::ostream *stream)
         s_maxVerbosity = max_verbosity;
         s_ostream = stream;
 
-        std::string message = fmt::format("Initialized logger with max verbosity {0}", VERBOSITY_STRINGS[max_verbosity]);
-        LOGGER.Log(INFO, message);
+        LOGGER.Log(INFO, "Initialized logger with max verbosity {0}", VERBOSITY_STRINGS[max_verbosity]);
     }
 }
 
