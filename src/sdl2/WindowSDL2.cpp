@@ -6,16 +6,10 @@
 static Logger LOGGER("WINDOW");
 
 
-// Static initialize
-bool WindowSDL2::s_sdlInitialized = false;
-
-
 WindowSDL2::WindowSDL2(std::string title, uint64_t window_config_flags):
     m_windowTitle(title)
 {
-    _SdlInitialize();
-
-    LOGGER.Log(Logger::INFO, "SDL Creating OpenGL Window ('{}')", title);
+    LOGGER.Log(Logger::DEBUG, "WindowSDL2 creating ('{}')", title);
 
     SDL_CallPointerReturningFunction(SDL_CreateWindow, m_pSdlWindow,
         m_windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_config_flags);
@@ -23,15 +17,17 @@ WindowSDL2::WindowSDL2(std::string title, uint64_t window_config_flags):
     SDL_CallPointerReturningFunction(SDL_CreateRenderer, m_pSdlRenderer,
         m_pSdlWindow, -1, SDL_RENDERER_ACCELERATED);
     
-    SDL_CallPointerReturningFunction(SDL_GL_CreateContext, m_pGlContext, m_pSdlWindow);
+    SDL_CallPointerReturningFunction(SDL_GL_CreateContext, m_glContext, m_pSdlWindow);
 
     SDL_ShowWindow(m_pSdlWindow);
+
+    LOGGER.Log(Logger::DEBUG, "WindowSDL2 created", title);
 }
 
 WindowSDL2::~WindowSDL2()
 {
-    LOGGER.Log(Logger::DEBUG, "Destroying window {}", m_windowTitle);
-    SDL_GL_DeleteContext(m_pGlContext);
+    LOGGER.Log(Logger::DEBUG, "Destroying window '{}'", m_windowTitle);
+    SDL_GL_DeleteContext(m_glContext);
     SDL_DestroyRenderer(m_pSdlRenderer);
     SDL_DestroyWindow(m_pSdlWindow);
 }
@@ -70,14 +66,4 @@ void WindowSDL2::SetSize(uint64_t new_width, uint64_t new_height)
 void WindowSDL2::SetPosition(uint64_t new_x, uint64_t new_y)
 {
     SDL_SetWindowPosition(m_pSdlWindow, new_x, new_y);
-}
-
-void WindowSDL2::_SdlInitialize()
-{
-    if (s_sdlInitialized) { return; }
-
-    LOGGER.Log(Logger::INFO, "SDL Init");
-    SDL_CallErrorReturningFunction(SDL_Init, SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-
-    s_sdlInitialized = true;
 }

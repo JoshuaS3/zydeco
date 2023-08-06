@@ -6,7 +6,13 @@ project("zydeco")
 
 # Locations
 set(SOURCE_DIR "src")
-set(INCLUDE_DIR "include" "include/sdl2" "include/events")
+set(LIB_SOURCE_DIR "lib/src")
+set(INCLUDE_DIR
+    "lib/include"
+    "include"
+    "include/sdl2"
+    "include/events"
+)
 
 
 # Compile settings
@@ -23,6 +29,7 @@ endif ()
 # Add source files
 include_directories(${INCLUDE_DIR})
 set(PROGRAM_SOURCES
+    "${LIB_SOURCE_DIR}/gl3w.c"
     "${SOURCE_DIR}/main.cpp"
     "${SOURCE_DIR}/Engine.cpp"
     "${SOURCE_DIR}/util/Fault.cpp"

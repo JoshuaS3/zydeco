@@ -22,14 +22,11 @@ public:
     void SetPosition(uint64_t new_x, uint64_t new_y) override;
 
 protected:
-    // One-time SDL_Init()
-    static bool s_sdlInitialized;
-    static void _SdlInitialize();
-
     // Window object info
     SDL_Window *m_pSdlWindow;
     SDL_Renderer *m_pSdlRenderer;
-    SDL_GLContext m_pGlContext;
+    SDL_GLContext m_glContext;
+
     std::string m_windowTitle;
 };
 

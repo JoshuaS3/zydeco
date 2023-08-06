@@ -1,3 +1,6 @@
+# external libs
+lib/
+
 # compiled objects
 build/
 

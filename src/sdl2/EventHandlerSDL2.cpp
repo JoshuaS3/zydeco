@@ -14,7 +14,7 @@ static Logger LOGGER("EVENTHANDLER");
 
 
 #define DISPATCH_EVENT(TYPE, EVENT, VALS...) \
-    for (IEvent##TYPE ## Subscriber *subscriber : m_event##TYPE ## Subscribers) \
+    for (IEvent ## TYPE ## Subscriber *subscriber : m_event ## TYPE ## Subscribers) \
     { \
         if (subscriber == nullptr) { break; } \
         LOGGER.Log(Logger::TRACE, "Dispatching " #TYPE "Event.On" #EVENT); \
@@ -22,14 +22,15 @@ static Logger LOGGER("EVENTHANDLER");
     } \
     break;
 
+
 EventHandlerSDL2::EventHandlerSDL2()
 {
-
+    LOGGER.Log(Logger::DEBUG, "EventHandlerSDL2 creating");
 }
 
 EventHandlerSDL2::~EventHandlerSDL2()
 {
-
+    LOGGER.Log(Logger::DEBUG, "EventHandlerSDL2 destroying");
 }
 
 bool EventHandlerSDL2::Update(uint64_t time_since_last_update_us)
@@ -94,29 +95,56 @@ bool EventHandlerSDL2::Update(uint64_t time_since_last_update_us)
 
 bool EventHandlerSDL2::RegisterKeyboardEventSubscriber(IEventKeyboardSubscriber *p_event_keyboard_subscriber)
 {
-    if (m_eventKeyboardSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS) { return false; }
+    LOGGER.Log(Logger::VERBOSE, "Registering IEventKeyboardSubscriber");
+
+    if (m_eventKeyboardSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS)
+    {
+        LOGGER.Log(Logger::ERROR, "Failed to register IEventKeyboardSubscriber; too many registered");
+        return false;
+    }
+
     m_eventKeyboardSubscribers.push_back(p_event_keyboard_subscriber);
     return true;
 }
 
 bool EventHandlerSDL2::RegisterMouseEventSubscriber(IEventMouseSubscriber *p_event_mouse_subscriber)
 {
-    if (m_eventMouseSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS) { return false; }
+    LOGGER.Log(Logger::VERBOSE, "Registering IEventMouseSubscriber");
+
+    if (m_eventMouseSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS)
+    {
+        LOGGER.Log(Logger::ERROR, "Failed to register IEventMouseSubscriber; too many registered");
+        return false;
+    }
+
     m_eventMouseSubscribers.push_back(p_event_mouse_subscriber);
     return true;
 }
 
 bool EventHandlerSDL2::RegisterQuitEventSubscriber(IEventQuitSubscriber *p_event_quit_subscriber)
 {
-    if (m_eventQuitSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS) { return false; }
+    LOGGER.Log(Logger::VERBOSE, "Registering IEventQuitSubscriber");
+
+    if (m_eventQuitSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS)
+    {
+        LOGGER.Log(Logger::ERROR, "Failed to register IEventQuitSubscriber; too many registered");
+        return false;
+    }
+
     m_eventQuitSubscribers.push_back(p_event_quit_subscriber);
     return true;
 }
 
 bool EventHandlerSDL2::RegisterWindowEventSubscriber(IEventWindowSubscriber *p_event_window_subscriber)
 {
+    LOGGER.Log(Logger::VERBOSE, "Registering IEventWindowSubscriber");
 
-    if (m_eventWindowSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS) { return false; }
+    if (m_eventWindowSubscribers.size() >= MAXIMUM_EVENT_SUBSCRIBERS)
+    {
+        LOGGER.Log(Logger::ERROR, "Failed to register IEventWindowSubscriber; too many registered");
+        return false;
+    }
+
     m_eventWindowSubscribers.push_back(p_event_window_subscriber);
     return true;
 }

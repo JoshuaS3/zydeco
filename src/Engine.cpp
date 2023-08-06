@@ -9,7 +9,9 @@
 
 
 Logger LOGGER("ENGINE");
+Logger EVENT_LOGGER("ENGINE::EVENT");
 Logger RENDER_LOGGER("ENGINE::RENDER");
+
 
 Engine::Engine(IEventHandler& r_event_handler, IWindow& r_window):
     m_rEventHandler(r_event_handler),
@@ -17,27 +19,29 @@ Engine::Engine(IEventHandler& r_event_handler, IWindow& r_window):
     m_framerate(60),
     m_frameRenderTimeUs(static_cast<int64_t>(1'000'000 / m_framerate))
 {
-    LOGGER.Log(Logger::INFO, "Initializing engine");
-    LOGGER.Log(Logger::DEBUG, "Frame render time: {}us", m_frameRenderTimeUs.count());
+    LOGGER.Log(Logger::DEBUG, "Engine creating");
+    LOGGER.Log(Logger::VERBOSE, "Frame render time: {}us", m_frameRenderTimeUs.count());
 
     r_event_handler.RegisterQuitEventSubscriber(this);
 
     std::atomic_init(&m_aIsExiting, false);
+
+    LOGGER.Log(Logger::DEBUG, "Engine created");
 }
 
 Engine::~Engine()
 {
-    LOGGER.Log(Logger::DEBUG, "Destroy engine");
+    LOGGER.Log(Logger::DEBUG, "Engine destroyed");
 }
 
 void Engine::OnQuitEvent()
 {
-    LOGGER.Log(Logger::DEBUG, "Received QuitEvent");
+    LOGGER.Log(Logger::VERBOSE, "QuitEvent occurred. Trigger exit.");
 
     m_aIsExiting.store(true);
 }
 
-void Engine::Start()
+void Engine::Execute()
 {
     LOGGER.Log(Logger::INFO, "Entering engine loop (thread handler)");
 
@@ -68,7 +72,7 @@ void Engine::Start()
     for (auto active_thread : m_threads)
     {
         while (active_thread.second->joinable()) {
-            LOGGER.Log(Logger::DEBUG, "Exiting thread {}", active_thread.first);
+            LOGGER.Log(Logger::DEBUG, "Waiting thread {} to exit", active_thread.first);
             active_thread.second->join();
         }
     }
@@ -76,15 +80,13 @@ void Engine::Start()
     LOGGER.Log(Logger::INFO, "Exiting engine loop (thread handler)");
 }
 
-void Engine::Kill()
-{
-
-}
-
 void Engine::DoEventLoop()
 {
+    EVENT_LOGGER.Log(Logger::DEBUG, "Starting event loop");
+
     m_rEventHandler.Update(0);
 
+    EVENT_LOGGER.Log(Logger::DEBUG, "Exiting event loop");
     m_aIsExiting.store(true);
 }
 
@@ -123,7 +125,6 @@ void Engine::DoRenderLoop()
 
     RENDER_LOGGER.Log(Logger::INFO, "Exiting render loop");
     m_aIsExiting.store(true);
-    std::this_thread::yield();
 }
 
 /*
