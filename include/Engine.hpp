@@ -4,21 +4,22 @@
 
 #include <chrono>
 #include <atomic>
-#include <map>
-#include <thread>
+#include <vector>
 
 #include "ZydecoCommon.hpp"
+#include "ThreadLooping.hpp"
 #include "IEventQuitSubscriber.hpp"
+#include "IUpdateable.hpp"
 
 
 class IEventHandler;
-class IWindow;
+class Renderer;
 
 
 class Engine : public IEventQuitSubscriber
 {
 public:
-    Engine(IEventHandler& r_event_handler, IWindow& r_window);
+    Engine(IEventHandler& r_event_handler, Renderer& r_renderer);
     ~Engine();
 
     void OnQuitEvent() override;
@@ -27,19 +28,10 @@ public:
 
 protected:
     IEventHandler& m_rEventHandler;
-    IWindow& m_rWindow;
+    Renderer& m_rRenderer;
 
+    std::vector<ThreadLooping*> m_threads;
     std::atomic<bool> m_aIsExiting;
-    std::atomic<bool> m_aSceneUpdated;
-    std::map<std::string, std::thread*> m_threads;
-    void DoEventLoop();
-    void DoRenderLoop();
-
-    std::chrono::time_point<std::chrono::steady_clock, std::chrono::microseconds> m_currentTime;
-
-    double m_framerate;
-    std::chrono::microseconds m_frameRenderTimeUs;
-    std::chrono::time_point<std::chrono::steady_clock, std::chrono::microseconds> m_frameRenderStartTime;
 };
 
 

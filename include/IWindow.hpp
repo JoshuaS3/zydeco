@@ -20,6 +20,9 @@ public:
     virtual void SetFullscreen(bool is_fullscreen) = 0;
     virtual void SetSize(uint64_t new_width, uint64_t new_height) = 0;
     virtual void SetPosition(uint64_t new_x, uint64_t new_y) = 0;
+
+    virtual void MakeContextCurrent() = 0;
+    virtual void MakeNullCurrent() = 0;
 };
 
 

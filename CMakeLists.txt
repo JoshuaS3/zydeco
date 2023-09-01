@@ -10,8 +10,10 @@ set(LIB_SOURCE_DIR "lib/src")
 set(INCLUDE_DIR
     "lib/include"
     "include"
-    "include/sdl2"
     "include/events"
+    "include/render"
+    "include/runtime"
+    "include/sdl2"
 )
 
 
@@ -32,10 +34,12 @@ set(PROGRAM_SOURCES
     "${LIB_SOURCE_DIR}/gl3w.c"
     "${SOURCE_DIR}/main.cpp"
     "${SOURCE_DIR}/Engine.cpp"
-    "${SOURCE_DIR}/util/Fault.cpp"
-    "${SOURCE_DIR}/util/Logger.cpp"
+    "${SOURCE_DIR}/render/Renderer.cpp"
+    "${SOURCE_DIR}/runtime/ThreadLooping.cpp"
     "${SOURCE_DIR}/sdl2/EventHandlerSDL2.cpp"
     "${SOURCE_DIR}/sdl2/WindowSDL2.cpp"
+    "${SOURCE_DIR}/util/Fault.cpp"
+    "${SOURCE_DIR}/util/Logger.cpp"
 )
 
 

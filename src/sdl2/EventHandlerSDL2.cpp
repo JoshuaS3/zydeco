@@ -72,6 +72,7 @@ bool EventHandlerSDL2::Update(uint64_t time_since_last_update_us)
             case SDL_MOUSEWHEEL: DISPATCH_EVENT(Mouse, MouseWheelScrollEvent, event.motion.xrel, event.motion.yrel);
             case SDL_QUIT: quit = true; DISPATCH_EVENT(Quit, QuitEvent);
             case SDL_WINDOWEVENT:
+            {
                 switch (event.window.type)
                 {
                     case SDL_WINDOWEVENT_MINIMIZED: DISPATCH_EVENT(Window, WindowMinimizedEvent);
@@ -82,6 +83,7 @@ bool EventHandlerSDL2::Update(uint64_t time_since_last_update_us)
                     case SDL_WINDOWEVENT_CLOSE: DISPATCH_EVENT(Window, WindowRequestedCloseEvent);
                     default: break;
                 }
+            }
             default: break;
         }
 

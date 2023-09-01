@@ -9,6 +9,7 @@
 #include "CommonSDL2.hpp"
 #include "EventHandlerSDL2.hpp"
 #include "WindowSDL2.hpp"
+#include "Renderer.hpp"
 #include "Engine.hpp"
 
 
@@ -22,7 +23,7 @@ static const char *ZYDECO_TERMOUT[] = {
 
 void on_terminate(void)
 {
-    ZydecoFault("TERMINATED");
+    ZydecoFault("PROGRAM TERMINATED.");
 }
 
 int main(int argc, char *argv[])
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
     std::set_terminate((std::terminate_handler)on_terminate);
 
     // Initialize logging
-    Logger::InitializeLogging(Logger::VERBOSE, &std::cout);
+    Logger::InitializeLogging(Logger::DEBUG, &std::cout);
     LOGGER.Log(Logger::INFO, "Logging initialized");
 
     // Initialize SDL environment
@@ -48,11 +49,15 @@ int main(int argc, char *argv[])
     // Create subsystems
     LOGGER.Log(Logger::INFO, "Creating subsystems...");
     EventHandlerSDL2 sdl_event_handler {};
-    WindowSDL2 sdl_window {"Zydeco", SDL_WINDOW_MAXIMIZED | SDL_WINDOW_RESIZABLE};
-    
+    WindowSDL2 sdl_window {"Zydeco", SDL_WINDOW_OPENGL};
+    Renderer gl_renderer {sdl_window};
+
+    LOGGER.Log(Logger::INFO, "Subsystems created");
+
     // Load OpenGL
     LOGGER.Log(Logger::INFO, "Loading OpenGL with GL3W...");
 
+    sdl_window.MakeContextCurrent();
     int gl3wRes = gl3wInit();
     if (gl3wRes != 0)
     {
@@ -65,14 +70,16 @@ int main(int argc, char *argv[])
     }
 
     LOGGER.Log(Logger::DEBUG, "OpenGL {}, GLSL {}", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
-
+    LOGGER.Log(Logger::DEBUG, "Renderer: {}", glGetString(GL_RENDERER));
     LOGGER.Log(Logger::INFO, "OpenGL loaded with GL3W");
 
-    LOGGER.Log(Logger::INFO, "Subsystems created");
+    // Constructor implictly creates a GL context and makes it current. Context must be current to load GL and ascertain
+    // capabilities. GL doesn't thread well, so we can't have that context be current here after initialization.
+    sdl_window.MakeNullCurrent();
 
     // Create engine
     LOGGER.Log(Logger::INFO, "Creating engine...");
-    Engine engine {sdl_event_handler, sdl_window};
+    Engine engine {sdl_event_handler, gl_renderer};
     LOGGER.Log(Logger::INFO, "Engine created");
 
     // Enter loop
@@ -80,7 +87,10 @@ int main(int argc, char *argv[])
     engine.Execute();
 
     // Loop returned
-    LOGGER.Log(Logger::INFO, "Exiting engine loop");
+    LOGGER.Log(Logger::INFO, "Quitting SDL");
+    SDL_Quit();
 
+    // Exiting program
+    LOGGER.Log(Logger::INFO, "Exiting");
     return 0;
 }

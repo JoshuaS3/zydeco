@@ -13,5 +13,4 @@ template<typename... Args>
 }
 
 
-
 #endif /* FAULT_HPP_ */

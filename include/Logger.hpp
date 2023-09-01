@@ -37,8 +37,12 @@ public:
 protected:
     static std::ostream *s_ostream;
     static Verbosity s_maxVerbosity;
+    static int s_loggerNameLongestLen;
 
     std::string m_loggerName;
+    std::string m_leftPadding;
+    int m_loggerNameLen;
+    int m_loggerNameLongestLen;
 };
 
 
