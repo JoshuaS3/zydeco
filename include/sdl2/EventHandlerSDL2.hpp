@@ -20,7 +20,7 @@ public:
     EventHandlerSDL2();
     ~EventHandlerSDL2();
 
-    bool Update(uint64_t time_since_last_update_us) override;
+    bool Update() override;
 
     bool RegisterKeyboardEventSubscriber(IEventKeyboardSubscriber *p_event_keyboard_subscriber) override;
     bool RegisterMouseEventSubscriber(IEventMouseSubscriber *p_event_mouse_subscriber) override;

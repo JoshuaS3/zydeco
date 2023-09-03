@@ -3,13 +3,13 @@
 #include "WindowSDL2.hpp"
 
 
-static Logger LOGGER("WINDOW");
+static Logger LOGGER("WindowSDL2");
 
 
 WindowSDL2::WindowSDL2(std::string title, uint64_t window_config_flags):
     m_windowTitle(title)
 {
-    LOGGER.Log(Logger::DEBUG, "WindowSDL2 creating ('{}')", title);
+    LOGGER.Log(Logger::TRACE, "WindowSDL2() for '{}'", title);
 
     SDL_CallPointerReturningFunction(SDL_CreateWindow, m_pSdlWindow,
         m_windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, window_config_flags);
@@ -21,13 +21,11 @@ WindowSDL2::WindowSDL2(std::string title, uint64_t window_config_flags):
     SDL_CallErrorReturningFunction(SDL_GL_SetSwapInterval, 1);
 
     SDL_ShowWindow(m_pSdlWindow);
-
-    LOGGER.Log(Logger::DEBUG, "WindowSDL2 created", title);
 }
 
 WindowSDL2::~WindowSDL2()
 {
-    LOGGER.Log(Logger::DEBUG, "Destroying window '{}'", m_windowTitle);
+    LOGGER.Log(Logger::TRACE, "~WindowSDL2() for {}", m_windowTitle);
     SDL_GL_DeleteContext(m_glContextRender);
     SDL_GL_DeleteContext(m_glContextMain);
     SDL_DestroyWindow(m_pSdlWindow);
@@ -40,13 +38,12 @@ void WindowSDL2::MakeContextCurrent()
 
 void WindowSDL2::MakeNullCurrent()
 {
+    LOGGER.Log(Logger::TRACE, "MakeNullCurrent() for '{}'", m_windowTitle);
     SDL_CallErrorReturningFunction(SDL_GL_MakeCurrent, m_pSdlWindow, nullptr);
 }
 
-bool WindowSDL2::Update(uint64_t time_since_last_update_us)
+bool WindowSDL2::Update()
 {
-    LOGGER.Log(Logger::TRACE, "Refreshing SDL window {} {}", SDL_GL_GetSwapInterval(), time_since_last_update_us);
-
     SDL_GL_SwapWindow(m_pSdlWindow);
 
     SDL_Delay(1);
@@ -56,21 +53,41 @@ bool WindowSDL2::Update(uint64_t time_since_last_update_us)
 
 void WindowSDL2::SetTitle(std::string new_title)
 {
+    LOGGER.Log(Logger::TRACE, "SetTitle({}) for '{}'", new_title, m_windowTitle);
     m_windowTitle = new_title;
     SDL_SetWindowTitle(m_pSdlWindow, m_windowTitle.c_str());
 }
 
 void WindowSDL2::SetFullscreen(bool is_fullscreen)
 {
+    LOGGER.Log(Logger::TRACE, "SetFullscreen({}) for '{}'", is_fullscreen, m_windowTitle);
     SDL_CallErrorReturningFunction(SDL_SetWindowFullscreen, m_pSdlWindow, is_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 }
 
 void WindowSDL2::SetSize(uint64_t new_width, uint64_t new_height)
 {
+    LOGGER.Log(Logger::TRACE, "SetSize(x: {}, y: {}) for '{}'", new_width, new_height, m_windowTitle);
     SDL_SetWindowSize(m_pSdlWindow, new_width, new_height);
 }
 
 void WindowSDL2::SetPosition(uint64_t new_x, uint64_t new_y)
 {
+    LOGGER.Log(Logger::TRACE, "SetPosition(x: {}, y: {}) for '{}'", new_x, new_y, m_windowTitle);
     SDL_SetWindowPosition(m_pSdlWindow, new_x, new_y);
+}
+
+int WindowSDL2::GetWidth()
+{
+    LOGGER.Log(Logger::TRACE, "GetWidth() for '{}'", m_windowTitle);
+    int w;
+    SDL_GL_GetDrawableSize(m_pSdlWindow, &w, nullptr);
+    return w;
+}
+
+int WindowSDL2::GetHeight()
+{
+    LOGGER.Log(Logger::TRACE, "GetHeight() for '{}'", m_windowTitle);
+    int h;
+    SDL_GL_GetDrawableSize(m_pSdlWindow, nullptr, &h);
+    return h;
 }

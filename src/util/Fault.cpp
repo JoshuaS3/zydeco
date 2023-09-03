@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <cpptrace/cpptrace.hpp>
 #include "ZydecoCommon.hpp"
 

@@ -15,13 +15,16 @@ public:
     WindowSDL2(std::string title, uint64_t window_config_flags);
     ~WindowSDL2();
 
-    bool Update(uint64_t time_since_last_update_us) override;
+    bool Update() override;
 
     // Basic public interface
     void SetTitle(std::string new_title) override;
     void SetFullscreen(bool is_fullscreen) override;
     void SetSize(uint64_t new_width, uint64_t new_height) override;
     void SetPosition(uint64_t new_x, uint64_t new_y) override;
+    
+    int GetWidth() override;
+    int GetHeight() override;
 
     void MakeContextCurrent();
     void MakeNullCurrent();

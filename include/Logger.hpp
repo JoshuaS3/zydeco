@@ -4,6 +4,7 @@
 
 #include <ostream>
 #include <string>
+#include <mutex>
 #include <fmt/format.h>
 
 
@@ -38,6 +39,7 @@ protected:
     static std::ostream *s_ostream;
     static Verbosity s_maxVerbosity;
     static int s_loggerNameLongestLen;
+    static std::mutex s_outputMutex;
 
     std::string m_loggerName;
     std::string m_leftPadding;

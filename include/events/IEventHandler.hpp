@@ -16,7 +16,7 @@ class IEventWindowSubscriber;
 class IEventHandler : public IUpdateable
 {
 public:
-    virtual bool Update(uint64_t time_since_last_update_us) = 0;
+    virtual bool Update() = 0;
 
     virtual bool RegisterKeyboardEventSubscriber(IEventKeyboardSubscriber *p_event_keyboard_subscriber) = 0;
     virtual bool RegisterMouseEventSubscriber(IEventMouseSubscriber *p_event_mouse_subscriber) = 0;
