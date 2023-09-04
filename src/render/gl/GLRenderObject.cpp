@@ -11,23 +11,26 @@ static Logger LOGGER("GLRenderObject");
 std::map<uint64_t, std::list<GLRenderObject*>> GLRenderObject::s_renderObjects = {};
 
 
-GLRenderObject::GLRenderObject(std::string gl_program_name, uint64_t render_priority):
-    m_renderPriority(render_priority),
+GLRenderObject::GLRenderObject(std::string gl_program_name, uint64_t render_order):
+    m_renderOrder(render_order),
     m_renderEnabled(true)
 {
-    m_glProgram = GLProgram::GetGLProgram(gl_program_name);
-    if (m_glProgram == nullptr) { ZydecoFault("GLRenderObject(): Program '{}' is nonexistent", gl_program_name); }
+    if (gl_program_name != "")
+    {
+        m_glProgram = GLProgram::GetGLProgram(gl_program_name);
+        if (m_glProgram == nullptr) { ZydecoFault("GLRenderObject(): Program '{}' is nonexistent", gl_program_name); }
+    }
 
-    s_renderObjects.insert(std::pair<uint64_t, std::list<GLRenderObject*>>(render_priority, {}));
-    s_renderObjects.at(render_priority).push_back(this);
+    s_renderObjects.insert(std::pair<uint64_t, std::list<GLRenderObject*>>(render_order, {}));
+    s_renderObjects.at(render_order).push_back(this);
 }
 
 GLRenderObject::~GLRenderObject()
 {
-    s_renderObjects.at(m_renderPriority).remove(this);
-    if (s_renderObjects.at(m_renderPriority).empty())
+    s_renderObjects.at(m_renderOrder).remove(this);
+    if (s_renderObjects.at(m_renderOrder).empty())
     {
-        s_renderObjects.erase(m_renderPriority);
+        s_renderObjects.erase(m_renderOrder);
     }
 }
 

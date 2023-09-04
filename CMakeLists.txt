@@ -6,9 +6,10 @@ project("zydeco")
 
 # Locations
 set(SOURCE_DIR "src")
-set(LIB_SOURCE_DIR "lib/src")
+set(LIB_SOURCE_DIR "lib")
 set(INCLUDE_DIR
-    "lib/include"
+    "lib/imgui"
+    "lib/gl3w/include"
     "include"
     "include/events"
     "include/render"
@@ -33,8 +34,19 @@ endif ()
 
 # Add source files
 include_directories(${INCLUDE_DIR})
+
+set(LIB_SOURCES
+    "${LIB_SOURCE_DIR}/gl3w/src/gl3w.c"
+    "${LIB_SOURCE_DIR}/imgui/imgui.cpp"
+    "${LIB_SOURCE_DIR}/imgui/imgui_demo.cpp"
+    "${LIB_SOURCE_DIR}/imgui/imgui_draw.cpp"
+    "${LIB_SOURCE_DIR}/imgui/imgui_tables.cpp"
+    "${LIB_SOURCE_DIR}/imgui/imgui_widgets.cpp"
+    "${LIB_SOURCE_DIR}/imgui/backends/imgui_impl_sdl2.cpp"
+    "${LIB_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
+)
+
 set(PROGRAM_SOURCES
-    "${LIB_SOURCE_DIR}/gl3w.c"
     "${SOURCE_DIR}/main.cpp"
     "${SOURCE_DIR}/Engine.cpp"
     "${SOURCE_DIR}/render/Renderer.cpp"
@@ -43,6 +55,7 @@ set(PROGRAM_SOURCES
     "${SOURCE_DIR}/render/gl/GLRenderObject.cpp"
     "${SOURCE_DIR}/render/objects/GLRenderObjectBackground.cpp"
     "${SOURCE_DIR}/render/objects/GLRenderObjectRainbowTriangle.cpp"
+    "${SOURCE_DIR}/render/objects/GLRenderObjectImGui.cpp"
     "${SOURCE_DIR}/runtime/ThreadLooping.cpp"
     "${SOURCE_DIR}/sdl2/EventHandlerSDL2.cpp"
     "${SOURCE_DIR}/sdl2/TimerSDL2.cpp"
@@ -54,8 +67,8 @@ set(PROGRAM_SOURCES
 
 # Link libraries
 find_package(cpptrace REQUIRED)
-link_libraries("fmt" "cpptrace::cpptrace" "SDL2" "GL")
+link_libraries("fmt" "cpptrace::cpptrace" "SDL2" "GL" "stb")
 
 
 # Output
-add_executable("zydeco" ${PROGRAM_SOURCES})
+add_executable("zydeco" ${LIB_SOURCES} ${PROGRAM_SOURCES})

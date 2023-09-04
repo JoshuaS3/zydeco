@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 
+#include "ZydecoCommon.hpp"
 #include "IEventHandler.hpp"
 
 

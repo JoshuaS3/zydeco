@@ -30,19 +30,10 @@ public:
 
 class GLRenderObject
 {
-private:
-    static std::map<uint64_t, std::list<GLRenderObject*>> s_renderObjects;
-
-protected:
-    friend class Renderer;
-
-    GLRenderObject(std::string gl_program_name, uint64_t render_priority);
-    ~GLRenderObject();
-
+public:
     void RenderEnable();
     void RenderDisable();
 
-public:
     template<int N, typename T>
     constexpr void RenderSetUniform(std::string name, std::array<void*, N> data)
     {
@@ -62,14 +53,23 @@ public:
         m_uniforms.insert(std::pair<std::string, glUniform>(name, uniform));
     }
 
-    GLProgram *m_glProgram;
-    uint64_t m_renderPriority;
-    bool m_renderEnabled;
-    std::map<std::string, glUniform> m_uniforms;
+protected:
+    friend class Renderer;
 
-    void GLTargetSetup();
+    GLRenderObject(std::string gl_program_name, uint64_t render_order);
+    ~GLRenderObject();
+
     virtual void Render() = 0;
     static std::map<uint64_t, std::list<GLRenderObject*>>& GetRenderObjects();
+    void GLTargetSetup();
+    bool m_renderEnabled;
+
+private:
+    static std::map<uint64_t, std::list<GLRenderObject*>> s_renderObjects;
+
+    GLProgram *m_glProgram;
+    uint64_t m_renderOrder;
+    std::map<std::string, glUniform> m_uniforms;
 };
 
 #endif /* GL_RENDER_OBJECT_HPP_ */

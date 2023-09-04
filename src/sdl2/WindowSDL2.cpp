@@ -20,13 +20,15 @@ WindowSDL2::WindowSDL2(std::string title, uint64_t window_config_flags):
     SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_CallErrorReturningFunction(SDL_GL_SetSwapInterval, 1);
 
+    ImGui_ImplSDL2_InitForOpenGL(m_pSdlWindow, m_glContextMain);
+    ImGui_ImplOpenGL3_Init();
+
     SDL_ShowWindow(m_pSdlWindow);
 }
 
 WindowSDL2::~WindowSDL2()
 {
     LOGGER.Log(Logger::TRACE, "~WindowSDL2() for {}", m_windowTitle);
-    SDL_GL_DeleteContext(m_glContextRender);
     SDL_GL_DeleteContext(m_glContextMain);
     SDL_DestroyWindow(m_pSdlWindow);
 }
@@ -46,7 +48,7 @@ bool WindowSDL2::Update()
 {
     SDL_GL_SwapWindow(m_pSdlWindow);
 
-    SDL_Delay(1);
+//    SDL_Delay(1);
 
     return false;
 }

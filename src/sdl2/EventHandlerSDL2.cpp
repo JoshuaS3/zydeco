@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-
 #include "ZydecoCommon.hpp"
 #include "CommonSDL2.hpp"
 #include "EventHandlerSDL2.hpp"
@@ -38,6 +36,7 @@ bool EventHandlerSDL2::Update()
 
     SDL_Event event;
     SDL_WaitEvent(&event);
+    ImGui_ImplSDL2_ProcessEvent(&event);
 
     switch (event.type)
     {

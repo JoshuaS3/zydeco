@@ -22,7 +22,7 @@ public:
     void SetFullscreen(bool is_fullscreen) override;
     void SetSize(uint64_t new_width, uint64_t new_height) override;
     void SetPosition(uint64_t new_x, uint64_t new_y) override;
-    
+
     int GetWidth() override;
     int GetHeight() override;
 
@@ -33,7 +33,6 @@ protected:
     // Window object info
     SDL_Window *m_pSdlWindow;
     SDL_GLContext m_glContextMain;
-    SDL_GLContext m_glContextRender;
 
     std::string m_windowTitle;
 };

@@ -1,9 +1,4 @@
 #include <iostream>
-#include <thread>
-
-#include <SDL2/SDL.h>
-#include "GL/gl3w.h"
-#include <GL/gl.h>
 
 #include "ZydecoCommon.hpp"
 #include "CommonSDL2.hpp"
@@ -39,13 +34,21 @@ int main(int argc, char *argv[])
     std::set_terminate(static_cast<std::terminate_handler>(on_terminate));
 
     // Initialize logging
-    Logger::InitializeLogging(Logger::TRACE, &std::cout);
+    Logger::InitializeLogging(Logger::DEBUG, &std::cout);
     LOGGER.Log(Logger::INFO, "main(): Logging initialized");
 
     // Initialize SDL environment
     LOGGER.Log(Logger::INFO, "main(): Initializing SDL...");
     SDL_CallErrorReturningFunction(SDL_Init, SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     LOGGER.Log(Logger::INFO, "main(): SDL initialized");
+
+    // Load ImGui
+    LOGGER.Log(Logger::INFO, "main(): Loading ImGui...");
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& imgui_io = ImGui::GetIO();
+    imgui_io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    //imgui_io.ConfigDockingWithShift = false;
 
     // Create subsystems
     LOGGER.Log(Logger::INFO, "main(): Creating subsystems...");
@@ -90,7 +93,16 @@ int main(int argc, char *argv[])
     LOGGER.Log(Logger::INFO, "main(): Entering engine loop");
     engine.Execute();
 
-    // Loop returned
+    // Engine exited
+    LOGGER.Log(Logger::INFO, "main(): Engine exited");
+
+    // Quit ImGui
+    LOGGER.Log(Logger::INFO, "main(): Quitting ImGui");
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
+    // Quit SDL
     LOGGER.Log(Logger::INFO, "main(): Quitting SDL");
     SDL_Quit();
 

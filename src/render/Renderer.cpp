@@ -1,6 +1,3 @@
-#include <GL/gl3w.h>
-#include <glm/glm.hpp>
-
 #include "ZydecoCommon.hpp"
 #include "Renderer.hpp"
 #include "IEventHandler.hpp"
@@ -80,24 +77,22 @@ bool Renderer::Update()
 
         glClearColor(0.18f, 0.18f, 0.18f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_BLEND);
 
         glViewport(0, 0, m_windowWidth, m_windowHeight);
 
-        glEnable(GL_BLEND);
-
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Render objects are mapped with {int: priority, list<GLRenderObject*>: objects}
-        // TODO: preliminary testing shows this iterator automatically sorts priority keys, determine if actually true
+        // Render objects are mapped with {int: order, list<GLRenderObject*>: objects}
+        // TODO: preliminary testing shows this iterator automatically sorts order keys, determine if actually true
         std::map<uint64_t, std::list<GLRenderObject*>> objects = GLRenderObject::GetRenderObjects();
-        for (std::pair<uint64_t, std::list<GLRenderObject*>> priority_list : objects)
+        for (std::pair<uint64_t, std::list<GLRenderObject*>> order_list : objects)
         {
-            for (GLRenderObject *render_object : priority_list.second)
+            for (GLRenderObject *render_object : order_list.second)
             {
                 LOGGER.Log(Logger::TRACE,
-                        "Update(): Rendering {} (with program '{}')",
-                        (void*)render_object,
-                        render_object->m_glProgram->GetGLProgramName());
+                        "Update(): Rendering {}",
+                        (void*)render_object);
                 render_object->Render();
             }
         }

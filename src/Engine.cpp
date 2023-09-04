@@ -9,9 +9,9 @@
 #include "IWindow.hpp"
 #include "ITimer.hpp"
 
-
 #include "GLRenderObjectBackground.hpp"
 #include "GLRenderObjectRainbowTriangle.hpp"
+#include "GLRenderObjectImGui.hpp"
 
 
 Logger LOGGER("Engine");
@@ -35,6 +35,8 @@ Engine::Engine(IEventHandler& r_event_handler, ITimer& r_core_timer, Renderer& r
     // <in some other game logic thread>
     auto tringle = new GLRenderObjectRainbowTriangle {};
     tringle->RenderSetUniform<1, unsigned int>("time", { r_core_timer.GetGlobalTimePointer() });
+
+    auto imgui = new GLRenderObjectImGui {};
 
 
 
