@@ -1,6 +1,8 @@
 #include <chrono>
 #include <atomic>
 
+#include <glm/ext.hpp>
+
 #include "ZydecoCommon.hpp"
 #include "Engine.hpp"
 #include "Renderer.hpp"
@@ -9,39 +11,30 @@
 #include "IWindow.hpp"
 #include "ITimer.hpp"
 
-#include "GLRenderObjectBackground.hpp"
-#include "GLRenderObjectRainbowTriangle.hpp"
+#include "GLTexture.hpp"
+
+#include "Mandelbrot.hpp"
+
 #include "GLRenderObjectImGui.hpp"
 
 
 Logger LOGGER("Engine");
 
 
-Engine::Engine(IEventHandler& r_event_handler, ITimer& r_core_timer, Renderer& r_renderer):
-    m_rEventHandler(r_event_handler),
-    m_rCoreTimer(r_core_timer),
-    m_rRenderer(r_renderer)
+Engine::Engine(IEventHandler& r_event_handler, IWindow& r_window, ITimer& r_core_timer, Renderer& r_renderer)
 {
     LOGGER.Log(Logger::TRACE, "Engine()");
 
+    auto settings = new MandelbrotSettings;
+    auto mandelbrot = new Mandelbrot(r_event_handler, r_window, settings);
+    auto imgui = new GLRenderObjectImGui(settings);
 
-
-    // <in some game logic thread>
-    auto bg = new GLRenderObjectBackground {};
-    // GLRenderObject.RenderSetUniform<var count, var type>("uniform name", { pointers to vars } )
-    bg->RenderSetUniform<1, unsigned int>("time", { r_core_timer.GetGlobalTimePointer() });
-
-
-    // <in some other game logic thread>
-    auto tringle = new GLRenderObjectRainbowTriangle {};
-    tringle->RenderSetUniform<1, unsigned int>("time", { r_core_timer.GetGlobalTimePointer() });
-
-    auto imgui = new GLRenderObjectImGui {};
-
-
+    m_jobs.push_back(&r_event_handler);
+    m_jobs.push_back(&r_core_timer);
+    m_jobs.push_back(mandelbrot);
+    m_jobs.push_back(&r_renderer);
 
     r_event_handler.RegisterQuitEventSubscriber(this);
-    std::atomic_init(&m_aIsExiting, false);
 }
 
 Engine::~Engine()
@@ -53,65 +46,29 @@ void Engine::OnQuitEvent()
 {
     LOGGER.Log(Logger::VERBOSE, "OnQuitEvent(): Quit event received");
 
-    m_aIsExiting.store(true);
+    m_isExiting = true;
 }
 
 void Engine::Execute()
 {
     LOGGER.Log(Logger::TRACE, "Execute()");
 
-    // Called from main()
-    LOGGER.Log(Logger::INFO, "Execute(): Entering engine main loop");
-
-    // Create and start subsystem threads
-    LOGGER.Log(Logger::DEBUG, "Execute(): Spawning subsystem threads");
-
-    ThreadLooping event_thread {"Event Handler", m_rEventHandler};
-    m_threads.push_back(&event_thread);
-    ThreadLooping timer_thread {"Core Timer", m_rCoreTimer};
-    m_threads.push_back(&timer_thread);
-    ThreadLooping render_thread {"Renderer", m_rRenderer};
-    m_threads.push_back(&render_thread);
-
-    for (auto* thread : m_threads)
+    if (m_jobs.size() > 0)
     {
-        thread->Start();
-    }
+        LOGGER.Log(Logger::INFO, "Execute(): Entering engine main loop");
 
-    // Main thread busy wait until signalled to exit, or until a thread exits
-    m_rCoreTimer.SetTimeout(1000);
-    m_rCoreTimer.Start();
-    while (m_aIsExiting.load() == false)
-    {
-        // While waiting: periodically run debug output commands
-        if (m_rCoreTimer.IsExpired())
+        while (!m_isExiting)
         {
-            LOGGER.Log(Logger::VERBOSE, "Execute(): Dispatching debug commands");
-            LOGGER.Log(Logger::VERBOSE, "Execute(): Time: {}", *m_rCoreTimer.GetGlobalTimePointer());
-            m_rRenderer.UpdateDebug();
-            m_rCoreTimer.Reset();
-            m_rCoreTimer.Start();
-        }
-
-        // Check for any thread exit
-        for (auto* thread : m_threads)
-        {
-            if (thread->IsRunning() == false)
+            for (auto job : m_jobs)
             {
-                m_aIsExiting.store(true);
-                break;
+                m_isExiting = job->Update();
+                if (m_isExiting) { break; }
             }
         }
     }
-
-    // Subsystem signaled exiting
-    LOGGER.Log(Logger::DEBUG, "Execute(): Signal to quit. Terminating threads...");
-
-    // Signal any running threads to terminate, and wait for termination
-    for (auto* thread : m_threads)
+    else
     {
-        thread->Terminate();
-        thread->WaitUntilFinished();
+        LOGGER.Log(Logger::WARNING, "Execute(): No jobs in queue");
     }
 
     // All threads terminated. Exit main engine loop...

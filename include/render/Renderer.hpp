@@ -39,9 +39,9 @@ private:
 
     std::string m_glString;
     std::string m_rendererString;
-    uint64_t m_frameTimeSum;
-    uint64_t m_frameCount;
-    float m_framerate;
+    uint64_t m_frameTimeSum = 0;
+    uint64_t m_frameCount = 0;
+    float m_framerate = 0.0;
 
     bool m_doRender;
 };

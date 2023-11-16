@@ -35,60 +35,66 @@ bool EventHandlerSDL2::Update()
     bool quit = false;
 
     SDL_Event event;
-    SDL_WaitEvent(&event);
-    ImGui_ImplSDL2_ProcessEvent(&event);
-
-    switch (event.type)
+    while (SDL_PollEvent(&event))
     {
-        case SDL_KEYDOWN: DISPATCH_EVENT(Keyboard, KeyPressEvent, event.key.keysym.sym, event.key.keysym.mod);
-        case SDL_KEYUP: DISPATCH_EVENT(Keyboard, KeyReleaseEvent, event.key.keysym.sym, event.key.keysym.mod);
-        case SDL_MOUSEBUTTONDOWN:
-        {
-            switch (event.button.button)
-            {
-                case SDL_BUTTON_LEFT: DISPATCH_EVENT(Mouse, MouseLeftDownEvent, event.button.x, event.button.y);
-                case SDL_BUTTON_MIDDLE: DISPATCH_EVENT(Mouse, MouseMiddleDownEvent, event.button.x, event.button.y);
-                case SDL_BUTTON_RIGHT: DISPATCH_EVENT(Mouse, MouseRightDownEvent, event.button.x, event.button.y);
-                default: break;
-            }
-        }
-        case SDL_MOUSEBUTTONUP:
-        {
-            switch (event.button.button)
-            {
-                case SDL_BUTTON_LEFT: DISPATCH_EVENT(Mouse, MouseLeftUpEvent, event.button.x, event.button.y);
-                case SDL_BUTTON_MIDDLE: DISPATCH_EVENT(Mouse, MouseMiddleUpEvent, event.button.x, event.button.y);
-                case SDL_BUTTON_RIGHT: DISPATCH_EVENT(Mouse, MouseRightUpEvent, event.button.x, event.button.y);
-                default: break;
-            }
-        }
-        case SDL_MOUSEMOTION: DISPATCH_EVENT(Mouse, MouseMoveEvent, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
-        case SDL_MOUSEWHEEL: DISPATCH_EVENT(Mouse, MouseWheelScrollEvent, event.motion.xrel, event.motion.yrel);
-        case SDL_QUIT:
-        {
-            quit = true;
-            DISPATCH_EVENT(Quit, QuitEvent);
-        }
-        case SDL_WINDOWEVENT:
-        {
-            switch (event.window.event)
-            {
-                case SDL_WINDOWEVENT_MINIMIZED: DISPATCH_EVENT(Window, WindowMinimizedEvent);
-                case SDL_WINDOWEVENT_MAXIMIZED: DISPATCH_EVENT(Window, WindowMaximizedEvent);
-                case SDL_WINDOWEVENT_RESTORED: DISPATCH_EVENT(Window, WindowRestoredEvent);
-                case SDL_WINDOWEVENT_EXPOSED: DISPATCH_EVENT(Window, WindowExposedEvent);
-                case SDL_WINDOWEVENT_RESIZED: DISPATCH_EVENT(Window, WindowResizedEvent, event.window.data1, event.window.data2);
-                case SDL_WINDOWEVENT_CLOSE: DISPATCH_EVENT(Window, WindowRequestedCloseEvent);
-                default: break;
-            }
-        }
-        default: break;
-    }
+        ImGui_ImplSDL2_ProcessEvent(&event);
+        if (ImGui::GetIO().WantCaptureMouse) { continue; }
 
-    if (quit)
-    {
-        LOGGER.Log(Logger::DEBUG, "Update(): Exiting EventHandler loop");
-        return true;
+        switch (event.type)
+        {
+            case SDL_KEYDOWN: DISPATCH_EVENT(Keyboard, KeyPressEvent, event.key.keysym.sym, event.key.keysym.mod);
+            case SDL_KEYUP: DISPATCH_EVENT(Keyboard, KeyReleaseEvent, event.key.keysym.sym, event.key.keysym.mod);
+            case SDL_MOUSEBUTTONDOWN:
+            {
+                switch (event.button.button)
+                {
+                    case SDL_BUTTON_LEFT: DISPATCH_EVENT(Mouse, MouseLeftDownEvent, event.button.x, event.button.y);
+                    case SDL_BUTTON_MIDDLE: DISPATCH_EVENT(Mouse, MouseMiddleDownEvent, event.button.x, event.button.y);
+                    case SDL_BUTTON_RIGHT: DISPATCH_EVENT(Mouse, MouseRightDownEvent, event.button.x, event.button.y);
+                    default: break;
+                }
+                break;
+            }
+            case SDL_MOUSEBUTTONUP:
+            {
+                switch (event.button.button)
+                {
+                    case SDL_BUTTON_LEFT: DISPATCH_EVENT(Mouse, MouseLeftUpEvent, event.button.x, event.button.y);
+                    case SDL_BUTTON_MIDDLE: DISPATCH_EVENT(Mouse, MouseMiddleUpEvent, event.button.x, event.button.y);
+                    case SDL_BUTTON_RIGHT: DISPATCH_EVENT(Mouse, MouseRightUpEvent, event.button.x, event.button.y);
+                    default: break;
+                }
+                break;
+            }
+            case SDL_MOUSEMOTION: DISPATCH_EVENT(Mouse, MouseMoveEvent, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+            case SDL_MOUSEWHEEL: DISPATCH_EVENT(Mouse, MouseWheelScrollEvent, event.motion.xrel, event.motion.yrel);
+            case SDL_QUIT:
+            {
+                quit = true;
+                DISPATCH_EVENT(Quit, QuitEvent);
+            }
+            case SDL_WINDOWEVENT:
+            {
+                switch (event.window.event)
+                {
+                    case SDL_WINDOWEVENT_MINIMIZED: DISPATCH_EVENT(Window, WindowMinimizedEvent);
+                    case SDL_WINDOWEVENT_MAXIMIZED: DISPATCH_EVENT(Window, WindowMaximizedEvent);
+                    case SDL_WINDOWEVENT_RESTORED: DISPATCH_EVENT(Window, WindowRestoredEvent);
+                    case SDL_WINDOWEVENT_EXPOSED: DISPATCH_EVENT(Window, WindowExposedEvent);
+                    case SDL_WINDOWEVENT_RESIZED: DISPATCH_EVENT(Window, WindowResizedEvent, event.window.data1, event.window.data2);
+                    case SDL_WINDOWEVENT_CLOSE: DISPATCH_EVENT(Window, WindowRequestedCloseEvent);
+                    default: break;
+                }
+                break;
+            }
+            default: break;
+        }
+
+        if (quit)
+        {
+            LOGGER.Log(Logger::DEBUG, "Update(): Exiting EventHandler loop");
+            return true;
+        }
     }
 
     return false;

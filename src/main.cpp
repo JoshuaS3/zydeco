@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
     // Create engine
     LOGGER.Log(Logger::INFO, "main(): Creating engine...");
-    Engine engine {sdl_event_handler, sdl_core_timer, gl_renderer};
+    Engine engine {sdl_event_handler, sdl_window, sdl_core_timer, gl_renderer};
     LOGGER.Log(Logger::INFO, "main(): Engine created");
 
     // Enter loop

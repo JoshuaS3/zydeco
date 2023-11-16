@@ -12,11 +12,12 @@
 
 
 class GLProgram;
+class GLTexture;
 
 
 enum class glUniformType
 {
-    FLOAT, INT, UINT
+    FLOAT, DOUBLE, INT, UINT, MAT4
 };
 
 struct glUniform
@@ -39,11 +40,13 @@ public:
     {
         glUniform uniform;
         if (std::is_same<T, float>::value)                  { uniform.type = glUniformType::FLOAT; }
+        else if (std::is_same<T, double>::value)            { uniform.type = glUniformType::DOUBLE; }
         else if (std::is_same<T, int>::value)               { uniform.type = glUniformType::INT; }
         else if (std::is_same<T, long int>::value)          { uniform.type = glUniformType::INT; }
         else if (std::is_same<T, unsigned int>::value)      { uniform.type = glUniformType::UINT; }
-        else if (std::is_same<T, long unsigned int>::value) { uniform.type = glUniformType::UINT; }
-        else { ZydecoFault("RenderSetUniform({}): Unknown data type {}", name, typeid(T).name()); }
+        else if (std::is_same<T, unsigned long int>::value) { uniform.type = glUniformType::UINT; }
+        else if (std::is_same<T, glm::mat4>::value)         { uniform.type = glUniformType::MAT4; }
+        else { ZydecoFault("RenderSetUniform('{}'): Unknown data type {}", name, typeid(T).name()); }
 
         uniform.quantity = N;
         uniform.data = new void *[N];
@@ -52,6 +55,8 @@ public:
 
         m_uniforms.insert(std::pair<std::string, glUniform>(name, uniform));
     }
+
+    void AddTexture(uint64_t texture_unit, GLTexture *texture);
 
 protected:
     friend class Renderer;
@@ -70,6 +75,7 @@ private:
     GLProgram *m_glProgram;
     uint64_t m_renderOrder;
     std::map<std::string, glUniform> m_uniforms;
+    std::map<uint64_t, GLTexture*> m_textures;
 };
 
 #endif /* GL_RENDER_OBJECT_HPP_ */

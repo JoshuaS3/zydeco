@@ -4,9 +4,11 @@
 #include "IWindow.hpp"
 #include "ITimer.hpp"
 #include "GLShader.hpp"
+#include "GLComputeShader.hpp"
 #include "GLProgram.hpp"
+#include "GLTexture.hpp"
 #include "GLRenderObject.hpp"
-#include "GLRenderObjectBackground.hpp"
+#include "GLRenderObjectFractal.hpp"
 #include "GLRenderObjectRainbowTriangle.hpp"
 
 
@@ -49,26 +51,30 @@ Renderer::Renderer(IEventHandler& r_event_handler, IWindow& r_window, ITimer& r_
     glDebugMessageCallback(MessageCallback, nullptr);
 
 
-    GLShader vert_shader {GL_VERTEX_SHADER,
-        #include "triangle.vs.glsl"
+    GLShader fractal_vert_shader {GL_VERTEX_SHADER,
+        #include "fractal.vs.glsl"
         };
-    GLShader frag_shader {GL_FRAGMENT_SHADER,
-        #include "triangle.fs.glsl"
+    GLShader fractal_frag_shader {GL_FRAGMENT_SHADER,
+        #include "fractal.fs.glsl"
         };
-    new GLProgram { "RainbowTriangle", {&vert_shader, &frag_shader} };
 
-    GLShader sky_vert_shader {GL_VERTEX_SHADER,
-        #include "background.vs.glsl"
+    GLShader fractal_compute_shader {GL_COMPUTE_SHADER,
+        #include "fractal.cs.glsl"
         };
-    GLShader sky_frag_shader {GL_FRAGMENT_SHADER,
-        #include "background.fs.glsl"
-        };
-    new GLProgram { "Background", {&sky_vert_shader, &sky_frag_shader} };
+
+    (new GLProgram { "FractalDisplay" })->Generate( {&fractal_vert_shader, &fractal_frag_shader} );
+
+    (new GLProgram { "FractalCompute" })->Generate( {&fractal_compute_shader} );
+
+    UpdateDebug();
+    m_rTimer.SetTimeout(1000);
+    m_rTimer.Start();
 };
 
 bool Renderer::Update()
 {
     // Render loop
+    m_rTimer.Update();
     frame_start = *m_rTimer.GetGlobalTimePointer();
 
     if (m_doRender)
@@ -83,6 +89,9 @@ bool Renderer::Update()
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        int window_width = m_rWindow.GetWidth();
+        int window_height = m_rWindow.GetHeight();
+
         // Render objects are mapped with {int: order, list<GLRenderObject*>: objects}
         // TODO: preliminary testing shows this iterator automatically sorts order keys, determine if actually true
         std::map<uint64_t, std::list<GLRenderObject*>> objects = GLRenderObject::GetRenderObjects();
@@ -93,6 +102,8 @@ bool Renderer::Update()
                 LOGGER.Log(Logger::TRACE,
                         "Update(): Rendering {}",
                         (void*)render_object);
+
+                render_object->RenderSetUniform<2, int>("screensize", {&window_width, &window_height});
                 render_object->Render();
             }
         }
@@ -100,8 +111,16 @@ bool Renderer::Update()
 
     m_rWindow.Update();
 
+    m_rTimer.Update();
     m_frameTimeSum += (*m_rTimer.GetGlobalTimePointer() - frame_start);
     m_frameCount++;
+
+    if (m_rTimer.IsExpired())
+    {
+        UpdateDebug();
+        m_rTimer.Reset();
+        m_rTimer.Start();
+    }
 
     return false;
 }
@@ -138,11 +157,11 @@ void Renderer::OnWindowRequestedCloseEvent()
 
 }
 
-// Called periodically from Engine::Execute (main thread)
 void Renderer::UpdateDebug()
 {
     m_framerate = static_cast<float>(m_frameCount) / (static_cast<float>(m_frameTimeSum) / 1000.);
     m_rWindow.SetTitle(fmt::format("Zydeco ({:.1f} FPS, OpenGL {})", m_framerate, m_glString));
+    LOGGER.Log(Logger::VERBOSE, "{}ms: {} fps", *m_rTimer.GetGlobalTimePointer(), m_framerate);
     m_frameTimeSum = 0;
     m_frameCount = 0;
 }

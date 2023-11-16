@@ -7,6 +7,7 @@
 
 #include <SDL2/SDL.h>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <GL/gl3w.h>
 #include <imgui.h>
 #include <backends/imgui_impl_sdl2.h>

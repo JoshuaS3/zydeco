@@ -16,9 +16,9 @@ void GLRenderObjectRainbowTriangle::Generate()
     float vertices[] = {
         // For visualization: each row is a vertex.
         // Each vertex has position [x, y, z] and color [r, g, b]
-        -0.5f, -0.5f, 0.0f, 1.0, 0.0, 0.0,   // red color for this vertex
-        0.5f, -0.5f, 0.0f, 0.0, 1.0, 0.0,   // green color
-        0.0f,  0.5f, 0.0f, 0.0, 0.0, 1.0,    // blue color for our top vertex
+        -0.5f, -0.5f, 1.0f, 1.0, 0.0, 0.0,   // red color for this vertex
+        0.5f, -0.5f, 1.0f, 0.0, 1.0, 0.0,   // green color
+        0.0f,  0.5f, 1.0f, 0.0, 0.0, 1.0,    // blue color for our top vertex
     };
 
     glGenVertexArrays(1, &m_VAO);

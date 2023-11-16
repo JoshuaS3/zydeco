@@ -1,17 +1,17 @@
 #include <GL/gl3w.h>
 
 #include "GLRenderObject.hpp"
-#include "GLRenderObjectBackground.hpp"
+#include "GLRenderObjectFractal.hpp"
 #include "GLProgram.hpp"
 
 
-GLRenderObjectBackground::GLRenderObjectBackground():
-    GLRenderObject::GLRenderObject("Background", 0)
+GLRenderObjectFractal::GLRenderObjectFractal():
+    GLRenderObject::GLRenderObject("FractalDisplay", 0)
 {
 
 }
 
-void GLRenderObjectBackground::Render()
+void GLRenderObjectFractal::Render()
 {
     if (!m_renderEnabled) { return; }
 

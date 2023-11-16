@@ -16,6 +16,13 @@ WindowSDL2::WindowSDL2(std::string title, uint64_t window_config_flags):
 
     SDL_CallPointerReturningFunction(SDL_GL_CreateContext, m_glContextMain, m_pSdlWindow);
 
+    SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_RED_SIZE, 8);
+    SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_GREEN_SIZE, 8);
+    SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_BLUE_SIZE, 8);
+    SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_ALPHA_SIZE, 8);
+    SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_MULTISAMPLESAMPLES, 4);
+
     SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_CallErrorReturningFunction(SDL_GL_SetAttribute, SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_CallErrorReturningFunction(SDL_GL_SetSwapInterval, 1);
@@ -48,7 +55,7 @@ bool WindowSDL2::Update()
 {
     SDL_GL_SwapWindow(m_pSdlWindow);
 
-//    SDL_Delay(1);
+    SDL_Delay(1);
 
     return false;
 }

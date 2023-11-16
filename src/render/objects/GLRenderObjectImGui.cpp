@@ -1,10 +1,11 @@
 #include "ZydecoCommon.hpp"
 #include "GLRenderObject.hpp"
 #include "GLRenderObjectImGui.hpp"
+#include "Mandelbrot.hpp"
 
 
-GLRenderObjectImGui::GLRenderObjectImGui():
-    GLRenderObject::GLRenderObject("", 10)
+GLRenderObjectImGui::GLRenderObjectImGui(MandelbrotSettings *p_settings):
+    GLRenderObject::GLRenderObject("", 10), m_pSettings(p_settings)
 {
     m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("/usr/share/fonts/FiraSans-Regular.ttf", 14);
     ImGui_ImplOpenGL3_CreateFontsTexture();
@@ -31,6 +32,7 @@ void GLRenderObjectImGui::Render()
 
     static bool show_demo_window = false;
     static bool show_about_window = false;
+    static bool show_settings_window = true;
     if (ImGui::BeginMainMenuBar())
     {
         ImGui::MenuItem("Zydeco", nullptr, &show_demo_window, false);
@@ -40,6 +42,7 @@ void GLRenderObjectImGui::Render()
             ImGui::MenuItem("About", nullptr, &show_about_window, true);
             ImGui::EndMenu();
         }
+        ImGui::MenuItem("Fractal Settings", nullptr, &show_settings_window, true);
         ImGui::EndMainMenuBar();
     }
 
@@ -56,6 +59,46 @@ void GLRenderObjectImGui::Render()
             ImGui::Text("<https://joshstock.in> <josh@joshstock.in>");
             ImGui::Separator();
             ImGui::TextWrapped("Zydeco is an experimental project in C++, graphics programming with OpenGL, procedural generation, and world simulation.");
+            ImGui::End();
+        }
+    }
+    if (show_settings_window)
+    {
+        ImGui::SetNextWindowSize({0, 0});
+        if (ImGui::Begin("Fractal Settings", &show_settings_window, 0))
+        {
+            ImGui::PushItemWidth(150);
+            if (ImGui::DragFloat("Re[z]", &m_pSettings->param_z, 0.0025, -6, 6)) { m_pSettings->restart = true; }
+            //if (ImGui::SliderInt("Max Iteration Count\n(Unscaled)", &m_pSettings->iteration_count, 0, 5000)) { m_pSettings->restart = true; }
+            if (ImGui::SliderInt("Iteration Step", &m_pSettings->iteration_step, 50, 1000)) { m_pSettings->restart = true; }
+            if (ImGui::DragFloat("Discard Threshold", &m_pSettings->discard_threshold, 0.01, 0.01, 16.)) { m_pSettings->restart = true; }
+            ImGui::DragFloat("Brightness", &m_pSettings->brightness, 0.1, 0.1, 100.0);
+            ImGui::PopItemWidth();
+            if (ImGui::Checkbox("Enable Interlacing", (bool*)(&m_pSettings->do_interlacing))) { m_pSettings->restart = true; }
+            ImGui::Text("Zoom: %.6Le\nX: %.6Le\nY: %.6Le\nIteration %i\nFirst Interlace %i\nInterlace Layer %i\nIteration Count (Scaled): %i",
+                m_pSettings->zoom,
+                m_pSettings->pos_x,
+                m_pSettings->pos_y,
+                m_pSettings->current_iteration,
+                m_pSettings->first_interlace,
+                m_pSettings->interlace_layer,
+                m_pSettings->adjusted_iteration_step);
+            if (ImGui::Button("Reset"))
+            {
+                m_pSettings->zoom = 2.0;
+                m_pSettings->pos_x = 0.0;
+                m_pSettings->pos_y = 0.0;
+
+                m_pSettings->first_interlace = 1;
+                m_pSettings->interlace_layer = 0;
+                m_pSettings->param_z = 0.0;
+                m_pSettings->brightness = 1.0;
+                m_pSettings->iteration_count = 100;
+                m_pSettings->iteration_step = 50;
+                m_pSettings->adjusted_iteration_step = 50;
+                m_pSettings->current_iteration = 0;
+                m_pSettings->discard_threshold = 4.;
+            }
             ImGui::End();
         }
     }

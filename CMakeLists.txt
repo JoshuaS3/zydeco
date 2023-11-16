@@ -12,6 +12,7 @@ set(INCLUDE_DIR
     "lib/gl3w/include"
     "include"
     "include/events"
+    "include/game"
     "include/render"
     "include/render/gl"
     "include/render/objects"
@@ -49,11 +50,14 @@ set(LIB_SOURCES
 set(PROGRAM_SOURCES
     "${SOURCE_DIR}/main.cpp"
     "${SOURCE_DIR}/Engine.cpp"
+    "${SOURCE_DIR}/game/Mandelbrot.cpp"
     "${SOURCE_DIR}/render/Renderer.cpp"
     "${SOURCE_DIR}/render/gl/GLProgram.cpp"
+    "${SOURCE_DIR}/render/gl/GLComputeShader.cpp"
     "${SOURCE_DIR}/render/gl/GLShader.cpp"
     "${SOURCE_DIR}/render/gl/GLRenderObject.cpp"
-    "${SOURCE_DIR}/render/objects/GLRenderObjectBackground.cpp"
+    "${SOURCE_DIR}/render/gl/GLTexture.cpp"
+    "${SOURCE_DIR}/render/objects/GLRenderObjectFractal.cpp"
     "${SOURCE_DIR}/render/objects/GLRenderObjectRainbowTriangle.cpp"
     "${SOURCE_DIR}/render/objects/GLRenderObjectImGui.cpp"
     "${SOURCE_DIR}/runtime/ThreadLooping.cpp"
@@ -67,7 +71,7 @@ set(PROGRAM_SOURCES
 
 # Link libraries
 find_package(cpptrace REQUIRED)
-link_libraries("fmt" "cpptrace::cpptrace" "SDL2" "GL" "stb")
+link_libraries("fmt" "cpptrace::cpptrace" "SDL2" "GL")
 
 
 # Output

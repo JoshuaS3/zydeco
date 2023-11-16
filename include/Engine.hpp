@@ -7,12 +7,12 @@
 #include <vector>
 
 #include "ZydecoCommon.hpp"
-#include "ThreadLooping.hpp"
 #include "IEventQuitSubscriber.hpp"
 #include "IUpdateable.hpp"
 
 
 class IEventHandler;
+class IWindow;
 class ITimer;
 class Renderer;
 
@@ -20,7 +20,7 @@ class Renderer;
 class Engine : public IEventQuitSubscriber
 {
 public:
-    Engine(IEventHandler& r_event_handler, ITimer& r_core_timer, Renderer& r_renderer);
+    Engine(IEventHandler& r_event_handler, IWindow& r_window, ITimer& r_core_timer, Renderer& r_renderer);
     ~Engine();
 
     void OnQuitEvent() override;
@@ -28,12 +28,8 @@ public:
     void Execute();
 
 protected:
-    IEventHandler& m_rEventHandler;
-    ITimer& m_rCoreTimer;
-    Renderer& m_rRenderer;
-
-    std::vector<ThreadLooping*> m_threads;
-    std::atomic<bool> m_aIsExiting;
+    std::vector<IUpdateable*> m_jobs;
+    bool m_isExiting = false;
 };
 
 

@@ -4,7 +4,7 @@ R""(
 
 
 in vec3 vertexColor;
-layout(location = 1) uniform uint time;
+uniform uint time;
 
 out vec4 fragColor;
 

@@ -6,18 +6,20 @@
 
 
 class ImFont;
+class MandelbrotSettings;
 
 
 class GLRenderObjectImGui : public GLRenderObject
 {
 public:
-    GLRenderObjectImGui();
+    GLRenderObjectImGui(MandelbrotSettings *p_settings);
     ~GLRenderObjectImGui() = default;
 
 private:
     void Render() override;
 
     ImFont *m_font;
+    MandelbrotSettings *m_pSettings;
 };
 
 

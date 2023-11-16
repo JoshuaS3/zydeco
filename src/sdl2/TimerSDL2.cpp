@@ -39,7 +39,6 @@ bool TimerSDL2::Update()
         return true;
     }
     s_globalCounterMs = SDL_GetTicks64();
-    SDL_Delay(1);
     return false;
 }
 

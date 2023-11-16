@@ -16,15 +16,16 @@ class GLProgram
 public:
     static GLProgram *GetGLProgram(std::string name);
 
-    GLProgram(std::string name, std::vector<GLShader*> shaders);
+    GLProgram(std::string name);
     ~GLProgram();
-    uint64_t GetGLProgramID();
+    void Generate(std::vector<GLShader*> shaders);
+    int64_t GetGLProgramID();
     std::string GetGLProgramName();
 
 private:
     static std::map<std::string, GLProgram*> s_glPrograms;
 
-    uint64_t m_glProgramId;
+    int64_t m_glProgramId;
     std::string m_glProgramName;
 };
 
