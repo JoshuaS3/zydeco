@@ -5,17 +5,16 @@ R""(
 layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 
-layout(rgba32f, binding=0) uniform image2D texture0;
+layout(rgba32f, binding = 0) uniform image2D texture0;
 uniform ivec2 screensize;
 uniform dvec2 offset;
 uniform double zoom;
-uniform double z;
-uniform double discard_threshold;
+uniform float z;
+uniform float discard_threshold;
 uniform int current_iteration;
 uniform int it_steps;
 uniform bool enable_interlacing;
 uniform int interlace_layer;
-uniform bool first_interlace;
 
 
 const int ADAM7_MATRIX[8][8] = {
@@ -64,14 +63,15 @@ void main()
     {
         if (abs(currentValue.x) < 0.6)
         {
-            double x = abs(c.x);
-            double y = abs(c.y);
+            double x = c.x;//abs(c.x);
+            double y = c.y;//abs(c.y);
             double x2 = x*x;
             double y2 = y*y;
 
             for (int i = 1; i < it_steps; i++)
             {
-                y = 2.*abs(x*y+z) + c.y - 2.*abs(z);
+                y = 2.*x*y + c.y;
+                //y = 2.*abs(x*y+z) + c.y - 2.*abs(z);
                 x = x2 - y2 + c.x;
                 x2 = x*x;
                 y2 = y*y;
@@ -86,7 +86,7 @@ void main()
     }
 
     imageStore(texture0, texelCoord, currentValue);
-    memoryBarrier();
+//    memoryBarrier();
 }
 
 

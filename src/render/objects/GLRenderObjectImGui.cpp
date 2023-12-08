@@ -75,7 +75,7 @@ void GLRenderObjectImGui::Render()
             ImGui::DragFloat("Brightness", &m_pSettings->brightness, 0.1, 0.1, 100.0);
             ImGui::PopItemWidth();
             if (ImGui::Checkbox("Enable Interlacing", (bool*)(&m_pSettings->do_interlacing))) { m_pSettings->restart = true; }
-            ImGui::Text("Zoom: %.6Le\nX: %.6Le\nY: %.6Le\nIteration %i\nFirst Interlace %i\nInterlace Layer %i\nIteration Count (Scaled): %i",
+            ImGui::Text("Zoom: %.6e\nX: %.6e\nY: %.6e\nIteration %i\nFirst Interlace %i\nInterlace Layer %i\nIteration Count (Scaled): %i",
                 m_pSettings->zoom,
                 m_pSettings->pos_x,
                 m_pSettings->pos_y,

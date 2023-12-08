@@ -52,67 +52,15 @@ void GLRenderObject::AddTexture(uint64_t texture_unit, GLTexture *texture)
 
 void GLRenderObject::GLTargetSetup()
 {
-    glUseProgram(m_glProgram->GetGLProgramID());
+    int program = m_glProgram->GetGLProgramID();
 
-    for (std::pair<std::string, glUniform> uniform : m_uniforms)
-    {
-        int location = glGetUniformLocation(m_glProgram->GetGLProgramID(), uniform.first.c_str());
-        if (location == -1)
-        {
-            // LOGGER.Log(Logger::WARNING, "Render(): Uniform '{}' does not exist for program '{}'", uniform.first, m_glProgram->GetGLProgramName());
-            continue;
-        }
+    glUseProgram(program);
 
-        if (uniform.second.type == glUniformType::FLOAT)
-        {
-            switch (uniform.second.quantity)
-            {
-                case 1: glUniform1f(location, *(float*)(uniform.second.data[0])); break;
-                case 2: glUniform2f(location, *(float*)(uniform.second.data[0]), *(float*)(uniform.second.data[1])); break;
-                case 3: glUniform3f(location, *(float*)(uniform.second.data[0]), *(float*)(uniform.second.data[1]), *(float*)(uniform.second.data[2])); break;
-                case 4: glUniform4f(location, *(float*)(uniform.second.data[0]), *(float*)(uniform.second.data[1]), *(float*)(uniform.second.data[2]), *(float*)(uniform.second.data[3])); break;
-            }
-        }
-        else if (uniform.second.type == glUniformType::DOUBLE)
-        {
-            switch (uniform.second.quantity)
-            {
-                case 1: glUniform1d(location, *(double*)(uniform.second.data[0])); break;
-                case 2: glUniform2d(location, *(double*)(uniform.second.data[0]), *(double*)(uniform.second.data[1])); break;
-                case 3: glUniform3d(location, *(double*)(uniform.second.data[0]), *(double*)(uniform.second.data[1]), *(double*)(uniform.second.data[2])); break;
-                case 4: glUniform4d(location, *(double*)(uniform.second.data[0]), *(double*)(uniform.second.data[1]), *(double*)(uniform.second.data[2]), *(double*)(uniform.second.data[3])); break;
-            }
-        }
-        else if (uniform.second.type == glUniformType::INT)
-        {
-            switch (uniform.second.quantity)
-            {
-                case 1: glUniform1i(location, *(int*)(uniform.second.data[0])); break;
-                case 2: glUniform2i(location, *(int*)(uniform.second.data[0]), *(int*)(uniform.second.data[1])); break;
-                case 3: glUniform3i(location, *(int*)(uniform.second.data[0]), *(int*)(uniform.second.data[1]), *(int*)(uniform.second.data[2])); break;
-                case 4: glUniform4i(location, *(int*)(uniform.second.data[0]), *(int*)(uniform.second.data[1]), *(int*)(uniform.second.data[2]), *(int*)(uniform.second.data[3])); break;
-            }
-        }
-        else if (uniform.second.type == glUniformType::UINT)
-        {
-            switch (uniform.second.quantity)
-            {
-                case 1: glUniform1ui(location, *(unsigned int*)(uniform.second.data[0])); break;
-                case 2: glUniform2ui(location, *(unsigned int*)(uniform.second.data[0]), *(unsigned int*)(uniform.second.data[1])); break;
-                case 3: glUniform3ui(location, *(unsigned int*)(uniform.second.data[0]), *(unsigned int*)(uniform.second.data[1]), *(unsigned int*)(uniform.second.data[2])); break;
-                case 4: glUniform4ui(location, *(unsigned int*)(uniform.second.data[0]), *(unsigned int*)(uniform.second.data[1]), *(unsigned int*)(uniform.second.data[2]), *(unsigned int*)(uniform.second.data[3])); break;
-            }
-        }
-        else if (uniform.second.type == glUniformType::MAT4)
-        {
-            glUniformMatrix4fv(location, uniform.second.quantity, false, (float*)(uniform.second.data[0]) );
-//            glUniformMatrix4fv(location, uniform.second.quantity, false, &((*(glm::mat4*)(uniform.second.data[0]))[0][0]));
-        }
-    }
+    UploadUniforms(program);
 
     for (std::pair<uint64_t, GLTexture*> texture : m_textures)
     {
-        texture.second->Bind(texture.first);
+        texture.second->BindAsTexture(texture.first);
     }
 }
 

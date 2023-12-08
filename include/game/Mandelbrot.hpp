@@ -11,13 +11,14 @@ class IEventHandler;
 class IWindow;
 class GLRenderObjectFractal;
 class GLTexture;
+class GLUniformUploader;
 
 
 struct MandelbrotSettings
 {
-    long double zoom = 2.0;
-    long double pos_x = 0.0;
-    long double pos_y = 0.0;
+    double zoom = 2.0;
+    double pos_x = 0.0;
+    double pos_y = 0.0;
 
     bool restart = true;
     int do_interlacing = false;
@@ -111,6 +112,7 @@ private:
     bool m_mouseDown = false;
     bool m_restart = true;
 
+    GLUniformUploader *m_pComputeUniformUploader;
     GLRenderObjectFractal *m_pRenderObject;
     GLTexture *m_pTexture;
 

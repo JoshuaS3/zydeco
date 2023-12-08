@@ -9,20 +9,23 @@
 class GLTexture
 {
 public:
-    static GLTexture& GetGLTexture(std::string name);
-
-    GLTexture(std::string texture_name, void *data_source, uint32_t width, uint32_t height);
+    GLTexture(uint32_t sized_format, void *data_source, uint32_t width, uint32_t height);
     ~GLTexture();
 
-    void Regenerate(int width, int height);
-    void Bind(uint64_t texture_unit);
+    uint32_t GetID();
 
-    uint32_t m_glTextureID;
+    void SetDataSourceAndReload(void *data_source, int width, int height);
+    void ReloadFromDataSource();
+
+    void BindAsTexture(uint64_t texture_unit);
+    void BindAsImage(uint64_t texture_unit);
+
 private:
-    static std::map<std::string, GLTexture*> s_textures;
+    uint32_t m_glTextureID = 0;
+    uint32_t m_baseFormat = 0;
+    uint32_t m_sizedFormat = 0;
+    uint32_t m_dataType = 0;
 
-    bool m_doRegen = false;
-    std::string m_name;
     void *m_pDataSource;
     uint32_t m_width;
     uint32_t m_height;

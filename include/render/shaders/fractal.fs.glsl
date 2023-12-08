@@ -3,11 +3,10 @@ R""(
 #version 460 core
 
 
-in ivec4 gl_FragCoord;
-layout(binding=0, rgba32f) uniform image2D texture0;
-uniform ivec2 screensize;
+in vec4 gl_FragCoord;
+layout(rgba32f, binding = 0) uniform image2D texture0;
 uniform int it_count;
-uniform double zoom;
+uniform ivec2 screensize;
 uniform float brightness;
 uniform bool enable_interlacing;
 uniform int interlace_layer;
@@ -18,7 +17,7 @@ const float INTERLACE_COLOR_MULTIPLIERS[7] = {3., 3., 2., 2., 2., 1., 1.};
 
 void main()
 {
-    ivec2 texcoord = gl_FragCoord.xy;
+    ivec2 texcoord = ivec2(gl_FragCoord.xy);
     bool point_contains_data = imageLoad(texture0, texcoord).r >= 0.9;
     if (enable_interlacing && first_interlace && !point_contains_data)
     {

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     std::set_terminate(static_cast<std::terminate_handler>(on_terminate));
 
     // Initialize logging
-    Logger::InitializeLogging(Logger::DEBUG, &std::cout);
+    Logger::InitializeLogging(Logger::VERBOSE, &std::cout);
     LOGGER.Log(Logger::INFO, "main(): Logging initialized");
 
     // Initialize SDL environment
@@ -79,10 +79,6 @@ int main(int argc, char *argv[])
     Renderer gl_renderer {sdl_event_handler, sdl_window, sdl_renderer_timer};
 
     LOGGER.Log(Logger::INFO, "main(): Subsystems created");
-
-    // Constructor implictly creates a GL context and makes it current. Context must be current to load GL and ascertain
-    // capabilities. GL doesn't thread well, so we can't have that context be current here after initialization.
-    sdl_window.MakeNullCurrent();
 
     // Create engine
     LOGGER.Log(Logger::INFO, "main(): Creating engine...");

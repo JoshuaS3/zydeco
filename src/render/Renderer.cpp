@@ -103,7 +103,6 @@ bool Renderer::Update()
                         "Update(): Rendering {}",
                         (void*)render_object);
 
-                render_object->RenderSetUniform<2, int>("screensize", {&window_width, &window_height});
                 render_object->Render();
             }
         }

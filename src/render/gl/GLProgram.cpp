@@ -36,7 +36,7 @@ GLProgram::~GLProgram()
 
 void GLProgram::Generate(std::vector<GLShader*> shaders)
 {
-    int64_t pid = glCreateProgram();
+    uint64_t pid = glCreateProgram();
 
     for (GLShader *p_shader : shaders)
     {
@@ -66,7 +66,7 @@ void GLProgram::Generate(std::vector<GLShader*> shaders)
     }
 }
 
-int64_t GLProgram::GetGLProgramID()
+uint64_t GLProgram::GetGLProgramID()
 {
     return m_glProgramId;
 }

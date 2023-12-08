@@ -4,6 +4,9 @@
 
 #include <cstdint>
 #include <string>
+#include <map>
+#include <vector>
+#include <array>
 
 #include <SDL2/SDL.h>
 #include <glm/glm.hpp>

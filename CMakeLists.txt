@@ -53,6 +53,7 @@ set(PROGRAM_SOURCES
     "${SOURCE_DIR}/game/Mandelbrot.cpp"
     "${SOURCE_DIR}/render/Renderer.cpp"
     "${SOURCE_DIR}/render/gl/GLProgram.cpp"
+    "${SOURCE_DIR}/render/gl/GLUniformUploader.cpp"
     "${SOURCE_DIR}/render/gl/GLComputeShader.cpp"
     "${SOURCE_DIR}/render/gl/GLShader.cpp"
     "${SOURCE_DIR}/render/gl/GLRenderObject.cpp"

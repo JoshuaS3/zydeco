@@ -5,6 +5,7 @@
 #include "IEventMouseSubscriber.hpp"
 #include "GLRenderObjectFractal.hpp"
 #include "GLProgram.hpp"
+#include "GLUniformUploader.hpp"
 #include "GLTexture.hpp"
 
 static Logger LOGGER("Mandelbrot");
@@ -29,20 +30,32 @@ Mandelbrot::Mandelbrot(IEventHandler& r_event_handler, IWindow& r_window, Mandel
     m_windowHeight = r_window.GetHeight();
 
 
-    m_pTexture = new GLTexture("Mandelbrot", nullptr, m_windowWidth, m_windowHeight);
+    m_pTexture = new GLTexture(GL_RGBA32F, nullptr, m_windowWidth, m_windowHeight);
 
-    m_pSettings->restart = true;
+    m_pComputeUniformUploader = new GLUniformUploader();
+    m_pComputeUniformUploader->AssignUniformPointer<1, int>("texture0", {new int {0}});
+    m_pComputeUniformUploader->AssignUniformPointer<2, int>("screensize", {&m_windowWidth, &m_windowHeight});
+    m_pComputeUniformUploader->AssignUniformPointer<2, double>("offset", {&m_pSettings->pos_x, &m_pSettings->pos_y});
+    m_pComputeUniformUploader->AssignUniformPointer<1, double>("zoom", {&m_pSettings->zoom});
+    m_pComputeUniformUploader->AssignUniformPointer<1, float>("z", {&m_pSettings->param_z});
+    m_pComputeUniformUploader->AssignUniformPointer<1, float>("discard_threshold", {&m_pSettings->discard_threshold});
+    m_pComputeUniformUploader->AssignUniformPointer<1, int>("current_iteration", {&m_pSettings->current_iteration});
+    m_pComputeUniformUploader->AssignUniformPointer<1, int>("it_steps", {&m_pSettings->adjusted_iteration_step});
+    m_pComputeUniformUploader->AssignUniformPointer<1, int>("enable_interlacing", {&m_pSettings->do_interlacing});
+    m_pComputeUniformUploader->AssignUniformPointer<1, int>("interlace_layer", {&m_pSettings->interlace_layer});
+
+//    m_pComputeUniformUploader->AssignUniformPointer<1, int>("first_interlace", {&m_pSettings->first_interlace});
+
     m_pRenderObject = new GLRenderObjectFractal {};
     m_pRenderObject->AddTexture(0, m_pTexture);
-    m_pTexture->Regenerate(m_windowWidth, m_windowHeight);
-    m_pRenderObject->RenderSetUniform<1, int>("texture0", {new int {0}});
-    m_pRenderObject->RenderSetUniform<2, int>("screensize", {&m_windowWidth, &m_windowHeight});
-    m_pRenderObject->RenderSetUniform<1, int>("it_count", {&m_pSettings->adjusted_iteration_step});
-    m_pRenderObject->RenderSetUniform<1, double>("zoom", {&m_pSettings->zoom});
-    m_pRenderObject->RenderSetUniform<1, float>("brightness", {&m_pSettings->brightness});
-    m_pRenderObject->RenderSetUniform<1, int>("enable_interlacing", {&m_pSettings->do_interlacing});
-    m_pRenderObject->RenderSetUniform<1, int>("interlace_layer", {&m_pSettings->interlace_layer});
-    m_pRenderObject->RenderSetUniform<1, int>("first_interlace", {&m_pSettings->first_interlace});
+//    m_pRenderObject->AssignUniformPointer<1, int>("texture0", {new int {0}});
+    m_pRenderObject->AssignUniformPointer<1, int>("it_count", {&m_pSettings->adjusted_iteration_step});
+//    m_pRenderObject->AssignUniformPointer<2, int>("screensize", {&m_windowWidth, &m_windowHeight});
+//    m_pRenderObject->AssignUniformPointer<1, double>("zoom", {&m_pSettings->zoom});
+    m_pRenderObject->AssignUniformPointer<1, float>("brightness", {&m_pSettings->brightness});
+    m_pRenderObject->AssignUniformPointer<1, int>("enable_interlacing", {&m_pSettings->do_interlacing});
+    m_pRenderObject->AssignUniformPointer<1, int>("interlace_layer", {&m_pSettings->interlace_layer});
+    m_pRenderObject->AssignUniformPointer<1, int>("first_interlace", {&m_pSettings->first_interlace});
 }
 
 Mandelbrot::~Mandelbrot()
@@ -63,7 +76,8 @@ bool Mandelbrot::Update()
         m_pSettings->interlace_layer = 0;
         m_pSettings->first_interlace = 1;
         m_pSettings->restart = false;
-        m_pTexture->Regenerate(m_windowWidth, m_windowHeight);
+        // using nullptr causes openGL to zero-reallocate texture with new width/height
+        m_pTexture->SetDataSourceAndReload(nullptr, m_windowWidth, m_windowHeight);
     }
     else if (m_pSettings->restart)
     {
@@ -120,30 +134,21 @@ bool Mandelbrot::Update()
         if (m_pSettings->restart)
         {
             m_pSettings->restart = false;
-            m_pTexture->Regenerate(m_windowWidth, m_windowHeight);
+//            m_pTexture->ReloadFromDataSource();
+            m_pTexture->SetDataSourceAndReload(nullptr, m_windowWidth, m_windowHeight);
         }
 
-        LOGGER.Log(Logger::INFO, "Dispatching compute (interlace layer {})", m_pSettings->interlace_layer);
+        LOGGER.Log(Logger::INFO, "Dispatching compute (interlace layer {}, {}x{})", m_pSettings->interlace_layer, m_windowWidth, m_windowHeight);
 
-        int program = GLProgram::GetGLProgram("FractalCompute")->GetGLProgramID();
+        uint64_t program = GLProgram::GetGLProgram("FractalCompute")->GetGLProgramID();
 
         glUseProgram(program);
+        assert(glIsProgram(program));
 
-        glBindImageTexture(0, m_pTexture->m_glTextureID, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+        m_pTexture->BindAsImage(0);
+        m_pComputeUniformUploader->UploadUniforms(program);
 
-        glUniform1i(glGetUniformLocation(program, "texture0"),           0);
-        glUniform2i(glGetUniformLocation(program, "screensize"),         m_windowWidth, m_windowHeight);
-        glUniform2d(glGetUniformLocation(program, "offset"),             m_pSettings->pos_x, m_pSettings->pos_y);
-        glUniform1d(glGetUniformLocation(program, "zoom"),               m_pSettings->zoom);
-        glUniform1d(glGetUniformLocation(program, "z"),                  m_pSettings->param_z);
-        glUniform1d(glGetUniformLocation(program, "discard_threshold"),  m_pSettings->discard_threshold);
-        glUniform1i(glGetUniformLocation(program, "current_iteration"),  m_pSettings->current_iteration);
-        glUniform1i(glGetUniformLocation(program, "it_steps"),           m_pSettings->adjusted_iteration_step);
-        glUniform1i(glGetUniformLocation(program, "enable_interlacing"), m_pSettings->do_interlacing);
-        glUniform1i(glGetUniformLocation(program, "interlace_layer"),    m_pSettings->interlace_layer);
-        glUniform1i(glGetUniformLocation(program, "first_interlace"),    m_pSettings->first_interlace);
-
-        glDispatchCompute((updated_window_width+31)/32, (updated_window_height+31)/32, 1);
+        glDispatchCompute((m_windowWidth+31)/32, (m_windowHeight+31)/32, 1);
 
         if (!m_pSettings->do_interlacing)
         {

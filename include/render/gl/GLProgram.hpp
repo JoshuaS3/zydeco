@@ -19,13 +19,13 @@ public:
     GLProgram(std::string name);
     ~GLProgram();
     void Generate(std::vector<GLShader*> shaders);
-    int64_t GetGLProgramID();
+    uint64_t GetGLProgramID();
     std::string GetGLProgramName();
 
 private:
     static std::map<std::string, GLProgram*> s_glPrograms;
 
-    int64_t m_glProgramId;
+    uint64_t m_glProgramId;
     std::string m_glProgramName;
 };
 
