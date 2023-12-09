@@ -25,7 +25,7 @@ Zydeco depends upon the following C/C++ libraries:
 either install it this way by the instructions in the linked repo, or remove
 its use in `src/util/Fault.cpp` and the requirement in `CMakeLists.txt`.
 * **`gl3w` should be run in a new directory `lib/gl3w` with `python3 gl3w_gen.py --ext`**
-* Install imgui with `git clone --branch docking --single-branch --depth=1 https://github.com/ocornut/imgui.git` to `lib/gl3w`
+* Install imgui with `git clone --branch docking --single-branch --depth=1 https://github.com/ocornut/imgui.git` to `lib/imgui`
 
 Depending on how your package manager installed SDL2, there might be a
 disparity for SDL2 `#include`s between imgui and this application. If this is
